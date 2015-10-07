@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@android:drawable/stat_sys_headset"
+            android:checkable="true"
+            android:title="Home"/>
+        <item
+            android:id="@+id/nav_messages"
+            android:icon="@android:drawable/ic_popup_reminder"
+            android:checkable="true"
+            android:title="Messages"/>
+        <item
+            android:id="@+id/nav_friends"
+            android:icon="@android:drawable/ic_menu_add"
+            android:checkable="true"
+            android:title="Friends"/>
+        <item
+            android:id="@+id/nav_discussion"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:checkable="true"
+            android:title="Discussion"/>
+    </group>
+
+    <item android:title="Sub items">
+        <menu>
+            <item
+                android:icon="@android:drawable/ic_dialog_info"
+                android:checkable="true"
+                android:title="Sub item 1"/>
+            <item
+                android:icon="@android:drawable/ic_dialog_dialer"
+                android:checkable="true"
+                android:title="Sub item 2"/>
+        </menu>
+    </item>
+
+</menu>
