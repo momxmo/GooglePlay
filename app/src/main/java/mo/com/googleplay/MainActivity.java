@@ -80,8 +80,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-//                mTabs.getTabAt(0).select();
-//                mListener.
+                BaseFragment fragment = FragmentFactory.createFragment(0);
+                    Loadingpager loadingPager = fragment.getLoadingPager();
+                    //触发加载数据
+                    loadingPager.triggerLoadData();
             }
         });
     }

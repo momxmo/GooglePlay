@@ -2,6 +2,7 @@ package mo.com.googleplay.conf;
 
 
 import mo.com.googleplay.utils.LogUtils;
+import mo.com.googleplay.utils.UIUtils;
 
 /**
  * @创建者 Administrator
@@ -20,7 +21,17 @@ public class Constants {
     public static final int DEBUGLEVEL = LogUtils.LEVEL_ALL;
 
     /**
-     * 网络请求
+     * 数据的有效时间
+     */
+    public static final long PROTOCOLTIMEOUT = 5 * 1000;
+    /**
+     * 缓存数据存放的位置
+     */
+    public static String GET_FILE_CACHE_DIR = UIUtils.getContext().getCacheDir().getAbsolutePath();
+
+
+    /**
+     * 网络请求连接
      */
     public static class Req {
         //网络接口

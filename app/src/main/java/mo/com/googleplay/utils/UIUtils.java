@@ -4,7 +4,7 @@ package mo.com.googleplay.utils;/**
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.*;
+import android.os.Handler;
 
 import mo.com.googleplay.base.BaseApplication;
 
@@ -92,5 +92,53 @@ public class UIUtils {
             getMainHandler().post(task);
         }
     }
+
+    /**
+     * 安全的执行一个task任务,并可以设置指定的延时时间
+     *
+     * @param task
+     */
+    public static void postTaskSafely(Runnable task, long delayMillis) {
+        getMainHandler().postDelayed(task, delayMillis);
+    }
+
+    /**
+     * 将任务移除
+     *
+     * @param task
+     */
+    public static void removeTask(Runnable task) {
+        getMainHandler().removeCallbacks(task);
+    }
+
+    /**
+     * dp-------px
+     *
+     * @param dp
+     * @return
+     */
+    public static int dp2px(int dp) {
+        /**
+         * density=dx/dp 比例值
+         */
+        float density = getResources().getDisplayMetrics().density;
+        return (int) (density * dp + .5f);
+    }
+
+    /**
+     * px------>dp
+     *
+     * @param px
+     * @return
+     */
+    public static int px2Dp(int px) {
+        /**
+         * 公式 ：denisity = px/dp
+         */
+        float density = getResources().getDisplayMetrics().density;
+        return (int) (px / density + .5f);
+    }
+
+
 }
 

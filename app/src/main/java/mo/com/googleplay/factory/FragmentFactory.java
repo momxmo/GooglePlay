@@ -13,7 +13,7 @@ import mo.com.googleplay.fragment.GameFragment;
 import mo.com.googleplay.fragment.HomeFragment;
 import mo.com.googleplay.fragment.HotFragment;
 import mo.com.googleplay.fragment.RecommendFragment;
-import mo.com.googleplay.fragment.SujectFragment;
+import mo.com.googleplay.fragment.SubjectFragment;
 import mo.com.googleplay.utils.LogUtils;
 
 /**
@@ -56,7 +56,6 @@ public class FragmentFactory {
     public static BaseFragment createFragment(int position) {
         //1.从缓存中获取
         if (fragmentsMap.containsKey(position)) {
-            LogUtils.i(TAG,"缓存中获取"+position);
             return fragmentsMap.get(position);
         }
         LogUtils.i(TAG,"加载"+position);
@@ -72,7 +71,7 @@ public class FragmentFactory {
                 fragment = new GameFragment();
                 break;
             case FRAGMENT_SUJECT:
-                fragment = new SujectFragment();
+                fragment = new SubjectFragment();
                 break;
             case FRAGMENT_RECOMMENT:
                 fragment = new RecommendFragment();

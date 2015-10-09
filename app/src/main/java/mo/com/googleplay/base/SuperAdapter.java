@@ -4,6 +4,8 @@ package mo.com.googleplay.base;/**
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 import mo.com.googleplay.factory.ThreadPoolFactory;
 import mo.com.googleplay.hodler.LoadMoreHolder;
 import mo.com.googleplay.utils.LogUtils;
+import mo.com.googleplay.utils.UIUtils;
 
 /**
  * @创建者 MoMxMo
@@ -22,19 +25,54 @@ import mo.com.googleplay.utils.LogUtils;
  * @更新时间 $Date
  * @更新描述 TODO
  */
-public abstract class SuperAdapter<T> extends BaseAdapter {
+public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView.OnItemClickListener {
 
     private static final int VIEWTYPE_LOADMORE = 0; //加载更多的viewtype标识
     private static final int VIEWTYPE_NORMAL = 1;   //普通item的viewtype标识
     private static final java.lang.String TAG = "SuperAdapter";
     private List<T> resData;
-    private Object loadMoreHolder;
     private LoadMoreHolder mLoadMoreHolder;
     private LoadMoreTask mLoadMoreTask;
+    private final AbsListView mAbsListView;
 
-    public SuperAdapter(List<T> resData) {
+    public SuperAdapter(AbsListView adsListView, List<T> resData) {
         this.resData = resData;
+        mAbsListView = adsListView;
+
+        //设置条目的点击事件的监听
+        mAbsListView.setOnItemClickListener(this);
     }
+
+    /**
+     * 条目的点击事件（这里要区别类型：普通viewtype 和 加载更多的viewtype）
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        if (getItemViewType(position) == VIEWTYPE_LOADMORE) {
+            //当前点击的是加载更多数据
+            triggerLoadMoreData();
+        } else {
+            //点击的是普通的listview条目
+            onNormalItemClick(parent, view, position, id);
+        }
+    }
+
+    /**
+     * 让子类去选择点击事件的处理
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     */
+    public  void onNormalItemClick(AdapterView<?> parent, View view, int position, long id){
+
+    }
+
 
     @Override
     public int getCount() {
@@ -140,7 +178,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter {
         //网络加载数据
         if (mLoadMoreTask == null) {    //用于标记，如果当前正在刷新加载,则不进行重复网络加载数据（优化）
             mLoadMoreTask = new LoadMoreTask();
-            LogUtils.i(TAG,"正在加载更多数据");
+            LogUtils.i(TAG, "正在加载更多数据");
             ThreadPoolFactory.getNormalThreadPool().execute(mLoadMoreTask);
         }
 
@@ -152,7 +190,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter {
      */
     class LoadMoreTask implements Runnable {
 
-        //设置指定每页加载数据
+        //设置指定每页加载数据,这里每页显示20
         public static final int PAGESIZE = 20;
 
         @Override
@@ -161,9 +199,58 @@ public abstract class SuperAdapter<T> extends BaseAdapter {
             int state;  //加载之后的结果
             List<T> loadmoreList = null;    //加载更多之后得到的网络数据
 
-            //TODO  今天先到这里吧
+            //  加载数据，让子类选择去实现这个方法
+            try {
+                loadmoreList = onLoadMore();
+                if (loadmoreList == null) {
+                    state = LoadMoreHolder.STATE_NONE;
+                } else {
+                    if (loadmoreList.size() < PAGESIZE) {
+                        //没有更多数据加载 <20
+                        state = LoadMoreHolder.STATE_NONE;
+                    } else {
+                        //还有更多数据加载
+                        state = LoadMoreHolder.STATE_LOADING;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                /*有异常改变状态,加载失败，显示重新retry重新加载*/
+                state = LoadMoreHolder.STATE_RETRY;
+            }
 
+            /*-------------------主线程中刷新UI，将数据添加到集合中--------*/
+            final List<T> finalLoadmoreList = loadmoreList;
+            final int finalState = state;
+            UIUtils.postTaskSafely(new Runnable() {
+                @Override
+                public void run() {
+
+//                        将获取到的数据添加到list数据中
+                    if (finalLoadmoreList != null) {
+                        resData.addAll(finalLoadmoreList);
+
+                        //通知Adapter数据改变
+                        SuperAdapter.this.notifyDataSetChanged();
+                    }
+
+                    /*---------------主线程更新UI----------------*/
+                    mLoadMoreHolder.setDataAndRefreshHolderView(finalState);
+
+                }
+            });
+            //加载更多的任务置空
+            mLoadMoreTask = null;
         }
+    }
+
+    /**
+     * @return
+     * @des 加载更多数据(这里要抛出异常，让方便调用者自己处理)
+     * @des 子类选择去实现
+     */
+    protected List<T> onLoadMore() throws Exception {
+        return null;
     }
 
     /**

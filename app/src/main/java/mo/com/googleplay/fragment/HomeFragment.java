@@ -3,23 +3,24 @@ package mo.com.googleplay.fragment;/**
  */
 
 import android.graphics.Color;
+import android.os.SystemClock;
+import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
-
-import com.google.gson.Gson;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.util.List;
 
+import mo.com.googleplay.R;
 import mo.com.googleplay.base.BaseFragment;
 import mo.com.googleplay.base.BaseHolder;
 import mo.com.googleplay.base.Loadingpager;
 import mo.com.googleplay.base.SuperAdapter;
 import mo.com.googleplay.bean.HomeBean;
-import mo.com.googleplay.conf.Constants;
+import mo.com.googleplay.hodler.HomeHeadPicHolder;
 import mo.com.googleplay.hodler.HomeHolder;
+import mo.com.googleplay.protocol.HomeProtocol;
 import mo.com.googleplay.utils.UIUtils;
 
 /**
@@ -34,10 +35,11 @@ import mo.com.googleplay.utils.UIUtils;
  */
 public class HomeFragment extends BaseFragment {
 
-    private List<String> mListData;
+    private static final java.lang.String TAG = "HomeFragment";
     private List<HomeBean.AppInfo> mListAppInfo;
     private List<String> mListPic;
     private HomeAdapter mHomeAdapter;
+    private HomeProtocol mProtocol;
 
     /**
      * 初始化加载数据
@@ -46,13 +48,49 @@ public class HomeFragment extends BaseFragment {
      */
     @Override
     protected Loadingpager.LoadedResult initData() {
+        mProtocol = new HomeProtocol();
+        HomeBean homeBean = null;
         try {
-        /*请求的URL地址
+            //在主页协议中加载数据（包含缓存数据的处理）
+            homeBean = mProtocol.loadData(0);
+
+            //校验数据的状态
+            Loadingpager.LoadedResult state = checkState(homeBean);
+
+            //有问题
+            if (state != Loadingpager.LoadedResult.SUCCESS) {
+                return state;
+            }
+
+            //检验AppInfo中的状态
+            state = checkState(homeBean.list);
+            if (state != Loadingpager.LoadedResult.SUCCESS) {
+                return state;
+            }
+
+            //数据没有问题
+            mListAppInfo = homeBean.list;
+            mListPic = homeBean.picture;
+
+            if (mHomeAdapter != null) {
+                mHomeAdapter.notifyDataSetChanged();
+            }
+
+            return state;
+        } catch (Exception e) {
+            e.printStackTrace();
+            //出现异常，显示加载错误状态
+            return Loadingpager.LoadedResult.ERROR;
+        }
+
+
+       /* try {
+        *//*请求的URL地址
         * http://localhost:8080/GooglePlayServer/home?index=0
-        * */
+        * *//*
             String url = Constants.Req.HOME_URL + "home";
 
-            /*使用OkHttp框架*/
+            *//*使用OkHttp框架*//*
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
@@ -62,7 +100,7 @@ public class HomeFragment extends BaseFragment {
             if (response.isSuccessful()) {
 //                String jsonString = response.body().string();
             }
-                String jsonString = response.body().string();
+            String jsonString = response.body().string();
 
             //解析数据
             Gson gson = new Gson();
@@ -95,7 +133,7 @@ public class HomeFragment extends BaseFragment {
             e.printStackTrace();
             //出现异常，显示加载错误状态
             return Loadingpager.LoadedResult.ERROR;
-        }
+        }*/
     }
 
 
@@ -110,26 +148,96 @@ public class HomeFragment extends BaseFragment {
         //没有数据
         ListView mListView = new ListView(UIUtils.getContext());
 
+        //去除listview的拖动背景色
         mListView.setCacheColorHint(Color.TRANSPARENT);
         mListView.setFadingEdgeLength(0);
+
+        /*设想这样一个场景，当ListView的内容有大于100页的情况下，
+        如果想滑动到第80页，用手指滑动到指定位置，
+        无疑是一件很费时的事情，如果想快速滑动到指定的位置，
+        只需加上ListView的fastScrollEnabled属性等于true，
+        启用快速滑动功能*/
         mListView.setFastScrollEnabled(true);
 
-        mHomeAdapter = new HomeAdapter(mListAppInfo);
+
+        //添加头部的轮播图
+        HomeHeadPicHolder headPicHolder = new HomeHeadPicHolder();
+        mListView.addHeaderView(headPicHolder.mHolderView);
+        headPicHolder.setDataAndRefreshHolderView(mListPic);
+
+
+        mHomeAdapter = new HomeAdapter(mListView, mListAppInfo);
         //设置adapter
         mListView.setAdapter(mHomeAdapter);
+
 
         return mListView;
     }
 
     private class HomeAdapter extends SuperAdapter {
-        public HomeAdapter(List resData) {
-            super(resData);
+        public HomeAdapter(AbsListView adsListView, List resData) {
+            super(adsListView, resData);
         }
 
         @Override
         protected BaseHolder getSpecialHolder() {
             return new HomeHolder();
         }
-    }
 
+        /**
+         * 加载更多数据
+         *
+         * @return
+         * @throws Exception
+         */
+        @Override
+        protected List<HomeBean.AppInfo> onLoadMore() throws Exception {
+            /*网络加载更多数据*/
+            SystemClock.sleep(2000);
+            return performLoadMore();
+        }
+
+        //点击listView item条目时的事件
+        @Override
+        public void onNormalItemClick(AdapterView parent, View view, int position, long id) {
+
+            Snackbar.make(view, "您点击了：" + position, Snackbar.LENGTH_LONG)
+                    .setAction("Ok", null)
+                    .setActionTextColor(UIUtils.getColor(R.color.colorAccent))
+                    .show(); // Don’t forget to show!
+
+        }
+
+        /**
+         * 网络操作加载更多数据
+         *
+         * @return
+         */
+        private List<HomeBean.AppInfo> performLoadMore() throws Exception {
+             /*请求的URL地址
+        * http://localhost:8080/GooglePlayServer/home?index=0
+        * */
+ /*           String url = Constants.Req.HOME_URL + "home";
+            *//*使用OkHttp框架*//*
+            OkHttpClient client = new OkHttpClient();
+
+            LogUtils.i(TAG, "size:" + mListAppInfo.size());
+            Request request = new Request.Builder()
+                    .url(url + "?index=" + mListAppInfo.size())
+                    .build();
+            Response response = client.newCall(request).execute();
+            String jsonString = response.body().string();*/
+
+            //解析数据
+            HomeBean homeBean = mProtocol.loadData(mListAppInfo.size());
+
+            if (homeBean != null) {
+                return homeBean.list;
+            } else {
+                return null;
+            }
+
+        }
+
+    }
 }
