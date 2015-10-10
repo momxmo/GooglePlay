@@ -23,7 +23,7 @@ public class Constants {
     /**
      * 数据的有效时间
      */
-    public static final long PROTOCOLTIMEOUT = 5 * 1000;
+    public static final long PROTOCOLTIMEOUT = 600 * 1000;
     /**
      * 缓存数据存放的位置
      */

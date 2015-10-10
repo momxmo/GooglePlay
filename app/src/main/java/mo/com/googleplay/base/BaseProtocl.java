@@ -130,13 +130,11 @@ public abstract class BaseProtocl<T> {
      * @return
      */
     private File getCacheFile(int index) {
-
         /**
          * 获取缓存的路径
          */
         String dir = Constants.GET_FILE_CACHE_DIR;
         String filename = getInterfaceKey() + "." + index;
-
         //缓存文件
         File cacheFile = new File(dir, filename);
         return cacheFile;
