@@ -2,6 +2,7 @@ package mo.com.googleplay.bean;/**
  * Created by  on
  */
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class HomeBean {
     public List<AppInfo> list;
     public List<String> picture;    //App图片地址
 
-    public static class AppInfo {
+    public static class AppInfo  implements Serializable {
         public String des;        //App描述
         public String downloadUrl; //下载链接
         public String iconUrl;     //图片连接
@@ -29,6 +30,21 @@ public class HomeBean {
         public String packageName; //App包名
         public long size;        //App大小
         public float stars;       //App的级别
+
+
+        @Override
+        public String toString() {
+            return "AppInfo{" +
+                    "des='" + des + '\'' +
+                    ", downloadUrl='" + downloadUrl + '\'' +
+                    ", iconUrl='" + iconUrl + '\'' +
+                    ", id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    ", packageName='" + packageName + '\'' +
+                    ", size=" + size +
+                    ", stars=" + stars +
+                    '}';
+        }
     }
 
 }

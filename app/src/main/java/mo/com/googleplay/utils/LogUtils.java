@@ -1,14 +1,14 @@
 package mo.com.googleplay.utils;
 
-import java.util.List;
-
 import android.text.TextUtils;
 import android.util.Log;
+
+import java.util.List;
 
 import mo.com.googleplay.conf.Constants;
 
 /**
- * @author itheima
+ * @author momxmo
  * @time 	2015-6-23 上午11:33:49
  * @des	   日志级别是LEVEL_ALL显示所有信息,包括System.out.println信息
  * @des  日志级别是LEVEL_OFF关闭所有信息,包括System.out.println信息

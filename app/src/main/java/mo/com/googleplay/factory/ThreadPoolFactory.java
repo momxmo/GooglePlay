@@ -18,23 +18,20 @@ import mo.com.googleplay.manager.ThreadProxy;
 public class ThreadPoolFactory {
     private static ThreadProxy mNormalThreadPool;  //普通线程池
     private static ThreadProxy mDownloadThreadPool; //下载线程池
-
     /**
      * 获取现在线程池
      * @return
      */
     public static ThreadProxy getDownloadThreadPool() {
-
         //使用单例模式进行优化处理，避免多次创建线程池(使用线程同步)
         if (mDownloadThreadPool == null) {
             synchronized (ThreadPoolFactory.class) {
                 //创建线程池，设置池子的大小为5，最大线程数为5，线程保存时间为3秒
-                mDownloadThreadPool = new ThreadProxy(5,5,3000);
+                mDownloadThreadPool = new ThreadProxy(2,5,3000);
             }
         }
         return mDownloadThreadPool;
     }
-
     /**
      * 获取普通线程池（单利模式创建使用）
      * @return

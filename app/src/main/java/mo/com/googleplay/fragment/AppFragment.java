@@ -98,7 +98,7 @@ public class AppFragment extends BaseFragment {
         }
 
         @Override
-        protected BaseHolder getSpecialHolder() {
+        protected BaseHolder getSpecialHolder(int positin) {
             return new AppHolder();
         }
 

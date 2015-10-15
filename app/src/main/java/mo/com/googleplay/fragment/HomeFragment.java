@@ -2,7 +2,8 @@ package mo.com.googleplay.fragment;/**
  * Created by  on
  */
 
-import android.graphics.Color;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -13,11 +14,13 @@ import android.widget.ListView;
 import java.util.List;
 
 import mo.com.googleplay.R;
+import mo.com.googleplay.activity.DetailsActivity;
 import mo.com.googleplay.base.BaseFragment;
 import mo.com.googleplay.base.BaseHolder;
 import mo.com.googleplay.base.Loadingpager;
 import mo.com.googleplay.base.SuperAdapter;
 import mo.com.googleplay.bean.HomeBean;
+import mo.com.googleplay.factory.ListViewFactory;
 import mo.com.googleplay.hodler.HomeHeadPicHolder;
 import mo.com.googleplay.hodler.HomeHolder;
 import mo.com.googleplay.protocol.HomeProtocol;
@@ -40,6 +43,7 @@ public class HomeFragment extends BaseFragment {
     private List<String> mListPic;
     private HomeAdapter mHomeAdapter;
     private HomeProtocol mProtocol;
+    public static final String APP_INFO = "aapInfo";
 
     /**
      * 初始化加载数据
@@ -146,19 +150,7 @@ public class HomeFragment extends BaseFragment {
     @Override
     public View initSuccessView() {
         //没有数据
-        ListView mListView = new ListView(UIUtils.getContext());
-
-        //去除listview的拖动背景色
-        mListView.setCacheColorHint(Color.TRANSPARENT);
-        mListView.setFadingEdgeLength(0);
-
-        /*设想这样一个场景，当ListView的内容有大于100页的情况下，
-        如果想滑动到第80页，用手指滑动到指定位置，
-        无疑是一件很费时的事情，如果想快速滑动到指定的位置，
-        只需加上ListView的fastScrollEnabled属性等于true，
-        启用快速滑动功能*/
-        mListView.setFastScrollEnabled(true);
-
+        ListView mListView = ListViewFactory.create();
 
         //添加头部的轮播图
         HomeHeadPicHolder headPicHolder = new HomeHeadPicHolder();
@@ -180,7 +172,7 @@ public class HomeFragment extends BaseFragment {
         }
 
         @Override
-        protected BaseHolder getSpecialHolder() {
+        protected BaseHolder getSpecialHolder(int positin) {
             return new HomeHolder();
         }
 
@@ -206,6 +198,12 @@ public class HomeFragment extends BaseFragment {
                     .setActionTextColor(UIUtils.getColor(R.color.colorAccent))
                     .show(); // Don’t forget to show!
 
+            Intent intent = new Intent(UIUtils.getContext(), DetailsActivity.class);
+            HomeBean.AppInfo appInfo = mListAppInfo.get(position);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(APP_INFO,  appInfo);
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
 
         /**

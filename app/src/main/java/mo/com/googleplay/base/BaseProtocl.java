@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import mo.com.googleplay.conf.Constants;
 import mo.com.googleplay.utils.IOUtils;
@@ -44,7 +45,7 @@ public abstract class BaseProtocl<T> {
 
             return t;
         }
-        LogUtils.i(TAG,"网络加载数据");
+        LogUtils.i(TAG, "网络加载数据");
 
         //没有缓存数据，或者缓存数据已经过期，执行网络加载数据
         return getDataFromNet(index);
@@ -115,13 +116,25 @@ public abstract class BaseProtocl<T> {
         return null;
     }
 
-        /**
-         * 让子类去解析自己的数据
-         * @param jsonCacheData
-         * @return
-         */
-
+    /**
+     * 让子类去解析自己的数据
+     *
+     * @param jsonCacheData
+     * @return
+     */
     protected abstract T parseJson(String jsonCacheData);
+/*    protected  T parseJson(String jsonCacheData) {
+        *//*通过反射拿到泛型的具体类型*//*
+
+        //得到字节码对象，强转为参数类型，带有泛型的父类
+        ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
+
+        //得到实际对象类型
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+        Gson gson = new Gson();
+        return gson.fromJson(jsonCacheData,actualTypeArguments[0]);
+    }*/
 
     /**
      * 通过index标记获缓存文件
@@ -134,7 +147,19 @@ public abstract class BaseProtocl<T> {
          * 获取缓存的路径
          */
         String dir = Constants.GET_FILE_CACHE_DIR;
-        String filename = getInterfaceKey() + "." + index;
+        Map<String, String> extraParmas = getExtraParmas();
+        String filename = "";
+        if (extraParmas != null) {
+            for (Map.Entry<String, String> info : extraParmas.entrySet()) {
+                String key = info.getKey(); //“packageName”
+                String packgeName = info.getValue();//具体的包名
+                //缓存文件的名称
+                filename = getInterfaceKey() + "." + packgeName;
+            }
+        } else {
+            //缓存文件的名称
+             filename = getInterfaceKey() + "." + index;
+        }
         //缓存文件
         File cacheFile = new File(dir, filename);
         return cacheFile;
@@ -151,8 +176,19 @@ public abstract class BaseProtocl<T> {
         String url = Constants.Req.HOME_URL + getInterfaceKey();
         //  使用OkHttp框架
         OkHttpClient client = new OkHttpClient();
+
+        url = url + "?index=" + index;
+        Map<String, String> extraParmas = getExtraParmas();
+        //额外的参数
+        if (extraParmas != null) {
+            for (Map.Entry<String,String> info: extraParmas.entrySet()) {
+                String key = info.getKey(); //参数key
+                String value = info.getValue();//key对应的具体的value
+                url = url + "&" + key + "=" + value;
+            }
+        }
         Request request = new Request.Builder()
-                .url(url + "?index=" + index)
+                .url(url)
                 .build();
         Response response = client.newCall(request).execute();
         String jsonString = response.body().string();
@@ -177,7 +213,7 @@ public abstract class BaseProtocl<T> {
             }
         /*-----------解析数据------------------------*/
             T t = parseJson(jsonString);
-            if (t!=null) {
+            if (t != null) {
                 return t;
             }
         }
@@ -185,10 +221,24 @@ public abstract class BaseProtocl<T> {
         return null;
     }
 
-        /**
-         * 获取接口的名称：比如Home 主页的连接地址  app 应用的连接地址
-         * @return
-         */
+    /**
+     * 获取接口的名称：比如Home 主页的连接地址  app 应用的连接地址
+     *
+     * @return
+     */
 
     public abstract String getInterfaceKey();
+
+    /**
+     * 提供使用者扩展添加访问连接的参数
+     *
+     * @return
+     */
+//    protected String getExtUrl() {
+//        return null;
+//    }
+    protected Map<String, String> getExtraParmas() {
+
+        return null;// 默认没有额外参数
+    }
 }

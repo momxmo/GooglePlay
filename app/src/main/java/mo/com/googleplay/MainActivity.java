@@ -1,6 +1,6 @@
 package mo.com.googleplay;
 
-import android.os.Bundle;
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,18 +10,21 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 
+import mo.com.googleplay.activity.LoginActivity;
+import mo.com.googleplay.base.BaseActivity;
 import mo.com.googleplay.base.BaseFragment;
 import mo.com.googleplay.base.Loadingpager;
 import mo.com.googleplay.factory.FragmentFactory;
 import mo.com.googleplay.utils.UIUtils;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TabLayout mTabs;
     private ViewPager viewPager;
@@ -30,8 +33,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TabFragmentAdapter mFragmentAdapter;
     private DrawerLayout mDrawer;
     private NavigationView mNavigationView;
+    private ImageView mUserHeader;
 
-    @Override
+ /*   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -40,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initToolBar();
         initData();
         initListener();
-    }
+    }*/
 
-    private void initToolBar() {
+    protected void initToolBar() {
         Toolbar mToolbar = (Toolbar) findViewById(R.id.id_toolbar);
         mToolbar.setTitleTextColor(UIUtils.getColor(R.color.window_background));
         setSupportActionBar(mToolbar);
@@ -57,7 +61,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * 设置监听事件的初始化
      */
-    private void initListener() {
+    protected void initListener() {
+
+        /*点击头像进行登入*/
+        mUserHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mListener = new MainOnPageChangeListener();
         //设置Tab选择监听事件
         mTabs.setOnTabSelectedListener(mListener);
@@ -81,13 +95,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onGlobalLayout() {
                 BaseFragment fragment = FragmentFactory.createFragment(0);
-                    Loadingpager loadingPager = fragment.getLoadingPager();
-                    //触发加载数据
-                    loadingPager.triggerLoadData();
+                Loadingpager loadingPager = fragment.getLoadingPager();
+                //触发加载数据
+                loadingPager.triggerLoadData();
             }
         });
     }
-    private void initData() {
+
+    protected void initData() {
         //获取当行显示的标题
         mTitleList = UIUtils.getStringArray(R.array.main_titles);
         for (int i = 0; i < mTitleList.length; i++) {
@@ -101,10 +116,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mTabs.setTabsFromPagerAdapter(mFragmentAdapter);//给Tabs设置适配器
     }
 
-    private void initView() {
+    protected void initView() {
+        setContentView(R.layout.activity_main);
         mTabs = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         mDrawer = (DrawerLayout) findViewById(R.id.main_drawer);
+        mUserHeader = (ImageView) findViewById(R.id.iv_user_head);
+
         mNavigationView = (NavigationView) findViewById(R.id.main_navigationview);
     }
 
@@ -165,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             viewPager.setCurrentItem(position);
             BaseFragment fragment = FragmentFactory.createFragment(position);
             if (fragment != null) {
-                 Loadingpager loadingPager = fragment.getLoadingPager();
+                Loadingpager loadingPager = fragment.getLoadingPager();
                 //触发加载数据
                 loadingPager.triggerLoadData();
             }

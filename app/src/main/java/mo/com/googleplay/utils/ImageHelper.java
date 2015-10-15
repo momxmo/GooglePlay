@@ -25,18 +25,16 @@ import mo.com.googleplay.R;
  * @更新描述 TODO
  */
 public class ImageHelper {
-
-
+    /**
+     * 使用单利模式的方式
+     */
     static ImageLoader mImageLoader;
-
     /**
      * 配置框架
      */
     static {
         //获得实例对象
         mImageLoader = ImageLoader.getInstance();
-
-
         /**
          * 显示图片的操作配置
          */
@@ -48,8 +46,6 @@ public class ImageHelper {
                 .displayer(new RoundedBitmapDisplayer(20))// 设置成圆角图片
                 .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2).
                         build();
-
-
         /**
          *
          *  // 使用DisplayImageOptions.Builder()创建DisplayImageOptions
@@ -79,14 +75,9 @@ public class ImageHelper {
                 .memoryCache(new UsingFreqLimitedMemoryCache(2 * 1024 * 1024))
                 .defaultDisplayImageOptions(options)
                 .build();
-
         mImageLoader.init(config);
-
     }
-
     public static <T extends View> void displayImage(ImageView container, String uri) {
         mImageLoader.displayImage(uri, container);
     }
-
-
 }

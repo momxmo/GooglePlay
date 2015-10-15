@@ -2,18 +2,18 @@ package mo.com.googleplay.fragment;/**
  * Created by  on
  */
 
-import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.AbsListView;
+import android.widget.ListView;
 
+import java.util.List;
 import java.util.Random;
 
-import mo.com.googleplay.R;
 import mo.com.googleplay.base.BaseFragment;
+import mo.com.googleplay.base.BaseHolder;
 import mo.com.googleplay.base.Loadingpager;
-import mo.com.googleplay.utils.Cheeses;
-import mo.com.googleplay.utils.UIUtils;
+import mo.com.googleplay.base.SuperAdapter;
+import mo.com.googleplay.factory.ListViewFactory;
 
 /**
  * @创建者 MoMxMo
@@ -27,6 +27,7 @@ import mo.com.googleplay.utils.UIUtils;
  * @更新描述 TODO
  */
 public class RecommendFragment  extends BaseFragment {
+    private List mListData;
 
     /**
      * 加载数据
@@ -53,12 +54,23 @@ public class RecommendFragment  extends BaseFragment {
 
     @Override
     public View initSuccessView() {
-        View view = View.inflate(UIUtils.getContext(), R.layout.item, null);
-        TextView tv = (TextView) view.findViewById(R.id.tv_tab_content);
-        ImageView iv = (ImageView) view.findViewById(R.id.header);
-        iv.setImageResource(Cheeses.getRandomCheeseDrawable());
-        tv.setText(this.getClass().getSimpleName());
-        tv.setGravity(Gravity.CENTER);
-        return view;
+        ListView mListView = ListViewFactory.create();
+
+
+        mListView.setAdapter(new RecommendAdapter(mListView,mListData));
+
+        return mListView;
+    }
+
+    private class RecommendAdapter extends SuperAdapter {
+
+        public RecommendAdapter(AbsListView adsListView, List resData) {
+            super(adsListView, resData);
+        }
+
+        @Override
+        protected BaseHolder getSpecialHolder(int positin) {
+            return null;
+        }
     }
 }

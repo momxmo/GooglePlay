@@ -23,7 +23,7 @@ public class Constants {
     /**
      * 数据的有效时间
      */
-    public static final long PROTOCOLTIMEOUT = 600 * 1000;
+    public static final long PROTOCOLTIMEOUT = 2 * 1000;
     /**
      * 缓存数据存放的位置
      */
@@ -40,5 +40,8 @@ public class Constants {
 
         //图片加载的数据
         public static final String HOME_IMAGE_URL = HOME_URL + "image?name=";
+
+        //下载连接
+        public static final String DOWNLOAD_URL = HOME_URL+"download?name=";
     }
 }

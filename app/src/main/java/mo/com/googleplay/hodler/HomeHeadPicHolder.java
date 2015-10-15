@@ -17,6 +17,7 @@ import mo.com.googleplay.base.BaseHolder;
 import mo.com.googleplay.conf.Constants;
 import mo.com.googleplay.utils.ImageHelper;
 import mo.com.googleplay.utils.UIUtils;
+import mo.com.googleplay.view.InnerViewPager;
 
 /**
  * @创建者 MoMxMo
@@ -31,7 +32,7 @@ import mo.com.googleplay.utils.UIUtils;
 public class HomeHeadPicHolder extends BaseHolder<List<String>> {
 
     private static final java.lang.String TAG = "HomeHeadPicHolder";
-    private ViewPager mViewPager;
+    private InnerViewPager mViewPager;
     private LinearLayout mContainer;
     private HomeHeadPicAdapter mhomeHeadPicAdapter;
     private List<String> mPicData;
@@ -63,12 +64,11 @@ public class HomeHeadPicHolder extends BaseHolder<List<String>> {
                 view.setBackgroundResource(R.drawable.indicator_selected);
             }
         }
-
+        //设置滑动的监听事件，处理选中原点的显示
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
-
             @Override
             public void onPageSelected(int position) {
                 position = position % mPicData.size();
@@ -82,7 +82,6 @@ public class HomeHeadPicHolder extends BaseHolder<List<String>> {
                     }
                 }
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {
             }
@@ -117,7 +116,6 @@ public class HomeHeadPicHolder extends BaseHolder<List<String>> {
                 return false;
             }
         });
-
     }
 
     /**
@@ -130,37 +128,30 @@ public class HomeHeadPicHolder extends BaseHolder<List<String>> {
         public void start() {
             UIUtils.postTaskSafely(this, 2000);
         }
-
         /**
          * 停止轮播
          */
         public void stop() {
             //将任务在主线程中移除
             UIUtils.removeTask(this);
-
         }
-
         @Override
         public void run() {
             //主线程中执行
             int curIndex = mViewPager.getCurrentItem();
             curIndex++;
             mViewPager.setCurrentItem(curIndex);
-
             start();
         }
     }
-
     @Override
     protected View initHolderView() {
         View view = View.inflate(UIUtils.getContext(), R.layout.home_head_pic, null);
         mContainer = (LinearLayout) view.findViewById(R.id.ll_point_container);
-        mViewPager = (ViewPager) view.findViewById(R.id.vp_head_pic);
+        mViewPager = (InnerViewPager) view.findViewById(R.id.vp_head_pic);
         return view;
     }
-
     private class HomeHeadPicAdapter extends PagerAdapter {
-
         @Override
         public int getCount() {
             if (mPicData != null) {

@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import java.util.List;
 
+import mo.com.googleplay.R;
 import mo.com.googleplay.base.BaseFragment;
 import mo.com.googleplay.base.BaseHolder;
 import mo.com.googleplay.base.Loadingpager;
@@ -22,7 +23,7 @@ import mo.com.googleplay.utils.UIUtils;
 /**
  * @创建者 MoMxMo
  * @创时间 2015/10/6:19:45
- * @描述
+ * @描述      专题项目
  * @项目名 GooglePlay
  *
  * @版本 $Rev
@@ -81,6 +82,9 @@ public class SubjectFragment extends BaseFragment {
         mListView.setFastScrollEnabled(true);
         mListView.setFadingEdgeLength(0);
 
+        mListView.setSelector(R.color.transparent);
+
+
         mAdapter = new SubjectAdapter(mListView, mListData);
         mListView.setAdapter(mAdapter);
 
@@ -94,7 +98,7 @@ public class SubjectFragment extends BaseFragment {
 
 
         @Override
-        protected BaseHolder getSpecialHolder() {
+        protected BaseHolder getSpecialHolder(int positin) {
             return new SubjectHolder();
         }
 

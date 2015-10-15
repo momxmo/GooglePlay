@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mo.com.googleplay.factory.ThreadPoolFactory;
@@ -30,7 +32,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
     private static final int VIEWTYPE_LOADMORE = 0; //加载更多的viewtype标识
     private static final int VIEWTYPE_NORMAL = 1;   //普通item的viewtype标识
     private static final java.lang.String TAG = "SuperAdapter";
-    private List<T> resData;
+    private List<T> resData = new ArrayList<T>();
     private LoadMoreHolder mLoadMoreHolder;
     private LoadMoreTask mLoadMoreTask;
     private final AbsListView mAbsListView;
@@ -52,6 +54,11 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        //判断有没有头部分
+        if (mAbsListView instanceof ListView) {
+            position = position - ((ListView) mAbsListView).getHeaderViewsCount();
+        }
 
         if (getItemViewType(position) == VIEWTYPE_LOADMORE) {
             //当前点击的是加载更多数据
@@ -104,7 +111,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
      */
     @Override
     public int getViewTypeCount() {
-        //1(jiazai9更多数据)+1（普通的类型）
+        //1(更多数据)+1（普通的类型）
         return super.getViewTypeCount() + 1;
     }
 
@@ -120,8 +127,18 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
         if (position == getCount() - 1) {
             return VIEWTYPE_LOADMORE;
         } else {
-            return VIEWTYPE_NORMAL;
+            return getNormalViewType(position);
         }
+    }
+
+    /**
+     *
+     * 子类可以复写，扩展自己的类型
+     * @param position
+     * @return
+     */
+    protected  int getNormalViewType(int position) {
+        return VIEWTYPE_NORMAL; //默认情况下1
     }
 
     @Override
@@ -138,7 +155,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
 
             } else {
                 //返回一个BaseHolder的子类
-                holder = getSpecialHolder();
+                holder = getSpecialHolder(position);
             }
         } else {
             holder = (BaseHolder) convertView.getTag();
@@ -266,7 +283,7 @@ public abstract class SuperAdapter<T> extends BaseAdapter implements AdapterView
      * @return
      * @dec 让子类去实现具体的BaseHodler，并且返回BaseHolder
      */
-    protected abstract BaseHolder getSpecialHolder();
+    protected abstract BaseHolder getSpecialHolder(int position);
 
 
     /**
